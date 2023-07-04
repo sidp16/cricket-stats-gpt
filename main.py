@@ -18,7 +18,7 @@ def extract_batting_data(series_id, match_id):
     batsmen_df = pd.DataFrame(
         columns=["Name", "Desc", "Runs", "Balls", "4s", "6s", "SR", "Innings"]
     )
-    for i, table in enumerate(table_body[0:4:2]):
+    for i, table in enumerate(table_body[::2]):
         rows = table.find_all("tr")
         for row in rows:
             cols = row.find_all("td")
@@ -43,7 +43,6 @@ def extract_batting_data(series_id, match_id):
                     ignore_index=True,
                 )
 
-    print(batsmen_df)
     return batsmen_df
 
 
@@ -74,7 +73,7 @@ def extract_bowling_data(series_id, match_id):
             "Innings",
         ]
     )
-    for i, table in enumerate(table_body[1:4:2]):
+    for i, table in enumerate(table_body[1::2]):
         rows = table.find_all("tr")
         for row in rows:
             cols = row.find_all("td")
@@ -100,11 +99,20 @@ def extract_bowling_data(series_id, match_id):
                     ),
                     ignore_index=True,
                 )
-    print(bowler_df)
     return bowler_df
 
 
 if __name__ == "__main__":
+    # MI V CSK 2018 IPL
     # extract_batting_data(8048, 1136561)
-    extract_bowling_data(1298134, 1298150)
-    extract_batting_data(1298134, 1298150)
+    # extract_bowling_data(8048, 1136561)
+
+    # IND V PAK 2022 T20 WC
+    # pakvind_batting = extract_batting_data(1298134, 1298150)
+    # pakvind_bowling = extract_bowling_data(1298134, 1298150)
+    # print(pakvind_batting)
+
+    # IND V ENG 2018 1st Test
+    # indveng_batting = extract_batting_data(1119528, 1119549)
+    indveng_bowling = extract_bowling_data(1119528, 1119549)
+    print(indveng_bowling)

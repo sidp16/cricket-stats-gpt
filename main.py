@@ -16,7 +16,7 @@ def extract_batting_data(series_id, match_id):
 
     table_body = soup.find_all("tbody")
     batsmen_df = pd.DataFrame(
-        columns=["Name", "Desc", "Runs", "Balls", "4s", "6s", "SR", "Team"]
+        columns=["Name", "Desc", "Runs", "Balls", "4s", "6s", "SR", "Innings"]
     )
     for i, table in enumerate(table_body[0:4:2]):
         rows = table.find_all("tr")
@@ -47,6 +47,64 @@ def extract_batting_data(series_id, match_id):
     return batsmen_df
 
 
+def extract_bowling_data(series_id, match_id):
+    URL = (
+        "https://www.espncricinfo.com/series/"
+        + str(series_id)
+        + "/scorecard/"
+        + str(match_id)
+    )
+    page = requests.get(URL)
+    bs = BeautifulSoup(page.content, "lxml")
+
+    table_body = bs.find_all("tbody")
+    bowler_df = pd.DataFrame(
+        columns=[
+            "Name",
+            "Overs",
+            "Maidens",
+            "Runs",
+            "Wickets",
+            "Econ",
+            "Dots",
+            "4s",
+            "6s",
+            "Wd",
+            "Nb",
+            "Innings",
+        ]
+    )
+    for i, table in enumerate(table_body[1:4:2]):
+        rows = table.find_all("tr")
+        for row in rows:
+            cols = row.find_all("td")
+            cols = [x.text.strip() for x in cols]
+            if len(cols) == 11:
+                bowler_df = bowler_df.append(
+                    pd.Series(
+                        [
+                            cols[0],
+                            cols[1],
+                            cols[2],
+                            cols[3],
+                            cols[4],
+                            cols[5],
+                            cols[6],
+                            cols[7],
+                            cols[8],
+                            cols[9],
+                            cols[10],
+                            i + 1,
+                        ],
+                        index=bowler_df.columns,
+                    ),
+                    ignore_index=True,
+                )
+    print(bowler_df)
+    return bowler_df
+
+
 if __name__ == "__main__":
-    extract_batting_data(8048, 1136561)
+    # extract_batting_data(8048, 1136561)
+    extract_bowling_data(1298134, 1298150)
     extract_batting_data(1298134, 1298150)

@@ -4,19 +4,21 @@
 # import openai
 import tempfile
 import streamlit as st
+
 # from bs4 import BeautifulSoup
-from streatlit_chat import message
 # from credentials import gpt_api_key
+from streamlit_chat import message
 from langchain.chat_models import ChatOpenAI
 from langchain.chains import ConversationalRetrievalChain
 from langchain.vectorstores import FAISS
+from langchain.document_loaders.csv_loader import CSVLoader
 from langchain.embeddings.openai import OpenAIEmbeddings
 
 user_api_key = st.sidebar.text_input(
-        label="#### Your OpenAI API key.",
-        placeholder="Paste your openAI API key, sk-",
-        type="password",
-    )
+    label="#### Your OpenAI API key.",
+    placeholder="Paste your openAI API key, sk-",
+    type="password",
+)
 
 uploaded_file = st.sidebar.file_uploader("upload", type="csv")
 
@@ -40,11 +42,13 @@ chain = ConversationalRetrievalChain.from_llm(
     retriever=vectorstore.as_retriever(),
 )
 
+
 def conversational_chat(query):
     result = chain({"question": query, "chat_history": st.session_state["history"]})
     st.session_state["history"].append((query, result["answer"]))
 
     return result["answer"]
+
 
 if "history" not in st.session_state:
     st.session_state["history"] = []
@@ -84,6 +88,4 @@ if st.session_state["generated"]:
                 key=str(i) + "_user",
                 avatar_style="big-smile",
             )
-            message(
-                st.session_state["generated"][i], key=str(i), avatar_style="thumbs"
-            )
+            message(st.session_state["generated"][i], key=str(i), avatar_style="thumbs")

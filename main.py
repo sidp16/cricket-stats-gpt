@@ -2,16 +2,12 @@ import requests
 import pandas as pd
 import re
 import openai
-import tempfile
-import streamlit as st
 from bs4 import BeautifulSoup
-from streatlit_chat import message
 from credentials import gpt_api_key
 from langchain.chat_models import ChatOpenAI
 from langchain.agents import create_pandas_dataframe_agent
-from langchain.chains import ConversationalRetrievalChain
-from langchain.vectorstores import FAISS
-from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain.agents import create_csv_agent
+from langchain.llms import OpenAI
 from espncricinfo.match import Match
 
 
@@ -119,12 +115,12 @@ if __name__ == "__main__":
     # extract_bowling_data(8048, 1136561)
 
     # IND V PAK 2022 T20 WC
-    m = Match("1298150")
-    filename = (
-        f"{m._team_1_abbreviation()} vs {m._team_2_abbreviation()} on {m._date()}"
-    )
-    pakvind_batting = extract_batting_data(1298134, 1298150)
-    pakvind_batting.to_csv(filename, index=False)
+    # m = Match("1298150")
+    # filename = (
+    # f"{m._team_1_abbreviation()} vs {m._team_2_abbreviation()} on {m._date()}.csv"
+    # )
+    # pakvind_batting = extract_batting_data(1298134, 1298150)
+    # pakvind_batting.to_csv(filename, index=False)
     # pakvind_bowling = extract_bowling_data(1298134, 1298150)
 
     # Testing for an ODI: IND V SL 2011 ODI WC FINAL
@@ -143,85 +139,56 @@ if __name__ == "__main__":
     # engvsa_batting = extract_batting_data(61687, 63864)
     # engvsa_bowling = extract_bowling_data(61687, 63864)
 
+    ## -- METHOD 1 -- ##
+
     # openai.api_key = gpt_api_key
-    # df = pd.read_csv("IND vs PAK on 2022-10-23")
+    # df = pd.read_csv("IND vs PAK on 2022-10-23.csv")
     # chat = ChatOpenAI(
-    # model_name="text-davinci-003", temperature=0.0, openai_api_key=gpt_api_key
+    # model_name="gpt-3.5-turbo", temperature=0.0, openai_api_key=gpt_api_key
     # )
     # agent = create_pandas_dataframe_agent(chat, df, verbose=True)
+    # agent.run("Who scored the most runs in the game?")
 
-    user_api_key = st.sidebar.text_input(
-        label="#### Your OpenAI API key.",
-        placeholder="Paste your openAI API key, sk-",
-        type="password",
+    ## -- METHOD 2 -- ##
+    agent = create_csv_agent(
+        OpenAI(temperature=0, openai_api_key=gpt_api_key),
+        "IND vs PAK on 2022-10-23.csv",
+        verbose=True,
     )
 
-    uploaded_file = st.sidebar.file_uploader("upload", type="csv")
+    agent.agent.llm_chain.prompt.template = """
+You are working with a pandas dataframe in Python. The name of the dataframe is `df`.
 
-    if uploaded_file:
-        with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
-            tmp_file.write(uploaded_file.getvalue())
-            tmp_file_path = temp_file.name
+The dataframe you will be working with is scorecard data from a cricket match.
+Each row is a specific players' statistics in a singular match.
+Here are some useful definitons:
+    - If a player has 2 4s, it means they hit two shots that count for 4 runs each. Therefore, in this case it means that they scored 8 runs by hitting 4s.
+    - If a player has 5 6s, it means they hit 5 shots that counted for 6 runs each. Therefore, in this case it means that they scored 30 runs by hitting 6s. 
 
-        loader = CSVLoader(
-            file_path=tmp_file_path, encoding="utf-8", csv_args={"delimiter": ","}
-        )
-        data = loader.load()
+You should use the tools below to answer the question posed of you:
 
-    st.write(data)
+python_repl_ast: A Python shell. Use this to execute python commands. Input should be a valid python command. When using this tool, sometimes output is abbreviated - make sure it does not look abbreviated before using it in your answer.
 
-    embeddings = OpenAIEmbeddings()
-    vectorstore = FAISS.from_documents(data, embeddings)
+Use the following format:
 
-    chain = ConversationalRetrievalChain.from_llm(
-        llm=ChatOpenAI(temperature=0.0, model_name="gpt-3.5-turbo"),
-        retriever=vectorstore.as_retriever(),
-    )
+Question: the input question you must answer
+Thought: you should always think about what to do
+Action: the action to take, should be one of [python_repl_ast]
+Action Input: the input to the action
+Observation: the result of the action
+... (this Thought/Action/Action Input/Observation can repeat N times)
+Thought: I now know the final answer
+Final Answer: the final answer to the original input question
 
-    def conversational_chat(query):
-        result = chain({"question": query, "chat_history": st.session_state["history"]})
-        st.session_state["history"].append((query, result["answer"]))
 
-        return result["answer"]
+This is the result of `print(df.head())`:
+{df_head}
 
-    if "history" not in st.session_state:
-        st.session_state["history"] = []
+Begin!
+Question: {input}
+{agent_scratchpad}
+    """
 
-    if "generated" not in st.session_state:
-        st.session_state["generated"] = [
-            "Hello ! Ask me anything about " + uploaded_file.name + " 🤗"
-        ]
+    # print(agent.agent.llm_chain.prompt.template)
 
-    if "past" not in st.session_state:
-        st.session_state["past"] = ["Hey ! 👋"]
-
-    # container for the chat history
-    response_container = st.container()
-    # container for the user's text input
-    container = st.container()
-
-    with container:
-        with st.form(key="my_form", clear_on_submit=True):
-            user_input = st.text_input(
-                "Query:", placeholder="Talk about your csv data here (:", key="input"
-            )
-            submit_button = st.form_submit_button(label="Send")
-
-        if submit_button and user_input:
-            output = conversational_chat(user_input)
-
-            st.session_state["past"].append(user_input)
-            st.session_state["generated"].append(output)
-
-    if st.session_state["generated"]:
-        with response_container:
-            for i in range(len(st.session_state["generated"])):
-                message(
-                    st.session_state["past"][i],
-                    is_user=True,
-                    key=str(i) + "_user",
-                    avatar_style="big-smile",
-                )
-                message(
-                    st.session_state["generated"][i], key=str(i), avatar_style="thumbs"
-                )
+    agent.run("Which team hit the most boundaries in the match?")

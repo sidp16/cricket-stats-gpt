@@ -1,113 +1,14 @@
-import requests
-import pandas as pd
-import re
-import openai
-from bs4 import BeautifulSoup
-from credentials import gpt_api_key
+from credentials import gpt_api_key, password, sql_database_uri
+from langchain.agents import create_csv_agent, create_sql_agent, AgentExecutor
+from langchain.agents.agent_toolkits import SQLDatabaseToolkit
+from langchain.agents.agent_types import AgentType
 from langchain.chat_models import ChatOpenAI
-from langchain.agents import create_pandas_dataframe_agent
-from langchain.agents import create_csv_agent
+from langchain.sql_database import SQLDatabase
 from langchain.llms import OpenAI
 from espncricinfo.match import Match
-
-
-def extract_batting_data(series_id, match_id):
-    URL = (
-        "https://www.espncricinfo.com/series/"
-        + str(series_id)
-        + "/scorecard/"
-        + str(match_id)
-    )
-    page = requests.get(URL)
-    soup = BeautifulSoup(page.content, "lxml")
-
-    table_body = soup.find_all("tbody")
-    batsmen_df = pd.DataFrame(
-        columns=["Name", "Desc", "Runs", "Balls", "4s", "6s", "SR", "Innings"]
-    )
-    for i, table in enumerate(table_body[::2]):
-        rows = table.find_all("tr")
-        for row in rows:
-            cols = row.find_all("td")
-            cols = [x.text.strip().replace("\xa0", " ") for x in cols]
-            if cols[0] == "Extras" or cols[0] == "TOTAL":
-                continue
-            if len(cols) == 8:
-                batsmen_df = batsmen_df.append(
-                    pd.Series(
-                        [
-                            re.sub(r"\W+", " ", cols[0].split("(c)")[0]).strip(),
-                            cols[1],
-                            cols[2],
-                            cols[3],
-                            cols[5],
-                            cols[6],
-                            cols[7],
-                            i + 1,
-                        ],
-                        index=batsmen_df.columns,
-                    ),
-                    ignore_index=True,
-                )
-    return batsmen_df
-
-
-def extract_bowling_data(series_id, match_id):
-    URL = (
-        "https://www.espncricinfo.com/series/"
-        + str(series_id)
-        + "/scorecard/"
-        + str(match_id)
-    )
-    page = requests.get(URL)
-    bs = BeautifulSoup(page.content, "lxml")
-
-    table_body = bs.find_all("tbody")
-    bowler_df = pd.DataFrame(
-        columns=[
-            "Name",
-            "Overs",
-            "Maidens",
-            "Runs",
-            "Wickets",
-            "Econ",
-            "Dots",
-            "4s",
-            "6s",
-            "Wd",
-            "Nb",
-            "Innings",
-        ]
-    )
-    for i, table in enumerate(table_body[1::2]):
-        rows = table.find_all("tr")
-        for row in rows:
-            cols = row.find_all("td")
-            cols = [x.text.strip() for x in cols]
-            if len(cols) == 11:
-                bowler_df = bowler_df.append(
-                    pd.Series(
-                        [
-                            cols[0],
-                            cols[1],
-                            cols[2],
-                            cols[3],
-                            cols[4],
-                            cols[5],
-                            cols[6],
-                            cols[7],
-                            cols[8],
-                            cols[9],
-                            cols[10],
-                            i + 1,
-                        ],
-                        index=bowler_df.columns,
-                    ),
-                    ignore_index=True,
-                )
-
-    return bowler_df
-
+from scorecards.scraping_tools import extract_batting_data, extract_bowling_data
+import mysql.connector
+from mysql.connector import Error
 
 if __name__ == "__main__":
     # MI V CSK 2018 IPL
@@ -116,9 +17,7 @@ if __name__ == "__main__":
 
     # IND V PAK 2022 T20 WC
     # m = Match("1298150")
-    # filename = (
-    # f"{m._team_1_abbreviation()} vs {m._team_2_abbreviation()} on {m._date()}.csv"
-    # )
+    # filename = f"{m._team_1_abbreviation()} vs {m._team_2_abbreviation()} on {m._date()}.csv"
     # pakvind_batting = extract_batting_data(1298134, 1298150)
     # pakvind_batting.to_csv(filename, index=False)
     # pakvind_bowling = extract_bowling_data(1298134, 1298150)
@@ -128,7 +27,10 @@ if __name__ == "__main__":
     # indvsl_bowling = extract_bowling_data(381449, 433606)
 
     # Testing for a Test with 4 Innings: IND V ENG 2018 1st Test
+    # m2 = Match("1119549")
+    # filename = f"{m2._team_1_abbreviation()} vs {m2._team_2_abbreviation()} on {m2._date()}.csv"
     # indveng_batting18 = extract_batting_data(1119528, 1119549)
+    # indveng_batting18.to_csv(filename, index=False)
     # indveng_bowling18 = extract_bowling_data(1119528, 1119549)
 
     # Testing for a Test with 3 Innings: IND V ENG 2021 4th Test
@@ -139,8 +41,35 @@ if __name__ == "__main__":
     # engvsa_batting = extract_batting_data(61687, 63864)
     # engvsa_bowling = extract_bowling_data(61687, 63864)
 
-    ## -- METHOD 1 -- ##
+    ## -- METHOD 3 -- ##
+    try:
+        connection = mysql.connector.connect(
+            host="localhost",
+            database="scorecards",
+            user="root",
+            password=password,
+        )
+        if connection.is_connected():
+            print("Connected to MySQL server!")
+    except Error as e:
+        print(f"Error connecting to MySQL server: {e}")
 
+    db = SQLDatabase.from_uri(sql_database_uri)
+    toolkit = SQLDatabaseToolkit(
+        db=db, llm=OpenAI(temperature=0, openai_api_key=gpt_api_key)
+    )
+
+    agent = create_sql_agent(
+        llm=ChatOpenAI(
+            temperature=0, model="gpt-3.5-turbo-0613", openai_api_key=gpt_api_key
+        ),
+        toolkit=toolkit,
+        verbose=True,
+        agent_type=AgentType.OPENAI_FUNCTIONS,
+    )
+    agent.run("Who has hit the most boundaries in one game?")
+
+    ## -- METHOD 1 -- ##
     # openai.api_key = gpt_api_key
     # df = pd.read_csv("IND vs PAK on 2022-10-23.csv")
     # chat = ChatOpenAI(
@@ -152,7 +81,7 @@ if __name__ == "__main__":
     ## -- METHOD 2 -- ##
     agent = create_csv_agent(
         OpenAI(temperature=0, openai_api_key=gpt_api_key),
-        "IND vs PAK on 2022-10-23.csv",
+        "ENG vs IND on 2018-08-01.csv",
         verbose=True,
     )
 
@@ -161,9 +90,15 @@ You are working with a pandas dataframe in Python. The name of the dataframe is 
 
 The dataframe you will be working with is scorecard data from a cricket match.
 Each row is a specific players' statistics in a singular match.
+Some player's go by just their surname, or just their first name. Learn to adapt to either.
 Here are some useful definitons:
     - If a player has 2 4s, it means they hit two shots that count for 4 runs each. Therefore, in this case it means that they scored 8 runs by hitting 4s.
     - If a player has 5 6s, it means they hit 5 shots that counted for 6 runs each. Therefore, in this case it means that they scored 30 runs by hitting 6s. 
+    - Boundary: A boundary is the scoring of 4 or 6 runs from a single shot. 
+    - Innings: An innings is one of the divisions of a cricket match during which one team takes its turn to bat. Therefore, if the innings number
+    is 2, they batted in the 2nd innings - therefore meaning that they batted 2nd in the match.
+    - Batting Average: A batting average is the total number of runs scored divided by the number of times they have been out. Therefore, if a player has
+    scored 60 runs and gotten out twice, their average is 30. Similarly, if a player has scored 150 runs but not gotten out, their average is undefined.
 
 You should use the tools below to answer the question posed of you:
 
@@ -188,7 +123,3 @@ Begin!
 Question: {input}
 {agent_scratchpad}
     """
-
-    # print(agent.agent.llm_chain.prompt.template)
-
-    agent.run("Which team hit the most boundaries in the match?")

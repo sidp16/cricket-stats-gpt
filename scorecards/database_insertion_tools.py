@@ -13,7 +13,7 @@ def insert_batting_data(dataframe, table_name):
     cursor = connection.cursor()
 
     # Prepare the SQL statement for inserting data into the table
-    sql = f"INSERT INTO {table_name} (match_id, team_id, player_name, description, runs, balls, fours, sixes, strike_rate, innings) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+    sql = f"INSERT INTO {table_name} (match_id, team_id, player_id, player_name, description, runs, balls, fours, sixes, strike_rate, innings) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
 
     # Insert each row of data from the DataFrame into the table
     for row in dataframe.itertuples(index=False):

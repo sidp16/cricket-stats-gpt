@@ -41,6 +41,7 @@ def extract_batting_data(series_id, match_id):
         rows = table.find_all("tr")
         for row in rows:
             cols = row.find_all("td")
+            # Getting player id with each player
             if len(cols) == 8:
                 for link in cols:
                     cols = link.find_all("a")
@@ -48,6 +49,7 @@ def extract_batting_data(series_id, match_id):
                         value = href.get("href")
                         if value.startswith("/cricketers/"):
                             player_id = value.split("-")[-1].strip()
+
             cols = row.find_all("td")
             cols = [x.text.strip().replace("\xa0", " ") for x in cols]
 
@@ -141,34 +143,3 @@ def extract_bowling_data(series_id, match_id):
                 )
 
     return bowler_df
-
-
-def extract_batting_player_ids(series_id, match_id):
-    URL = (
-        "https://www.espncricinfo.com/series/"
-        + str(series_id)
-        + "/scorecard/"
-        + str(match_id)
-    )
-    page = requests.get(URL)
-    soup = BeautifulSoup(page.content, "lxml")
-
-    table_body = soup.find_all("tbody")
-
-    for i, table in enumerate(table_body[::2]):
-        rows = table.find_all("tr")
-        for row in rows:
-            cols = row.find_all("td")
-            # Checks if it is a player
-            if len(cols) == 8:
-                for link in cols:
-                    cols = link.find_all("a")
-                    for href in cols:
-                        value = href.get("href")
-                        if value.startswith("/cricketers/"):
-                            id = value.split("-")[-1].strip()
-
-
-if __name__ == "__main__":
-    # extract_batting_player_ids(1298134, 1298150)
-    extract_batting_data(1298134, 1298150)

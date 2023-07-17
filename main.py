@@ -17,14 +17,13 @@ if __name__ == "__main__":
     # extract_bowling_data(8048, 1136561)
 
     # IND V PAK 2022 T20 WC
-    # m = Match("1298150")
-    # filename = (
-    # f"{m._team_1_abbreviation()} vs {m._team_2_abbreviation()} on {m._date()}.csv"
-    # )
+    m = Match("1298150")
+    filename = (
+        f"{m._team_1_abbreviation()} vs {m._team_2_abbreviation()} on {m._date()}.csv"
+    )
     pakvind_batting = extract_batting_data(1298134, 1298150)
-    # pakvind_batting.to_csv(filename, index=False)
-    # print(pakvind_batting)
-    # insert_batting_data(pakvind_batting, "batting")
+    pakvind_batting.to_csv(filename, index=False)
+    insert_batting_data(pakvind_batting, "batting")
     # pakvind_bowling = extract_bowling_data(1298134, 1298150)
     # pakvind_bowling.to_csv(filename, index=False)
 

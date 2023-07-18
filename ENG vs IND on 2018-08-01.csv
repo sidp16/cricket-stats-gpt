@@ -1,45 +1,45 @@
-Match ID,Team ID,Name,Desc,Runs,Balls,4s,6s,SR,Innings
-1119549,1,Alastair Cook,b Ashwin,13,28,2,0,46.42,1
-1119549,1,Keaton Jennings,b Mohammed Shami,42,98,4,0,42.85,1
-1119549,1,Joe Root,run out (Kohli),80,156,9,0,51.28,1
-1119549,1,Dawid Malan,lbw b Mohammed Shami,8,14,1,0,57.14,1
-1119549,1,Jonny Bairstow,b Yadav,70,88,9,0,79.54,1
-1119549,1,Ben Stokes,c & b Ashwin,21,41,2,0,51.21,1
-1119549,1,Jos Buttler,lbw b Ashwin,0,2,0,0,0.00,1
-1119549,1,Sam Curran,c †Karthik b Mohammed Shami,24,71,3,0,33.80,1
-1119549,1,Adil Rashid,lbw b Sharma,13,18,2,0,72.22,1
-1119549,1,Stuart Broad,lbw b Ashwin,1,7,0,0,14.28,1
-1119549,1,James Anderson,not out,2,15,0,0,13.33,1
-1119549,6,Murali Vijay,lbw b Curran,20,45,4,0,44.44,2
-1119549,6,Shikhar Dhawan,c Malan b Curran,26,46,3,0,56.52,2
-1119549,6,KL Rahul,b Curran,4,2,1,0,200.00,2
-1119549,6,Virat Kohli,c Broad b Rashid,149,225,22,1,66.22,2
-1119549,6,Ajinkya Rahane,c Jennings b Stokes,15,34,1,0,44.11,2
-1119549,6,Dinesh Karthik,b Stokes,0,4,0,0,0.00,2
-1119549,6,Hardik Pandya,lbw b Curran,22,52,3,0,42.30,2
-1119549,6,Ravichandran Ashwin,b Anderson,10,15,2,0,66.66,2
-1119549,6,Mohammed Shami,c Malan b Anderson,2,4,0,0,50.00,2
-1119549,6,Ishant Sharma,lbw b Rashid,5,17,0,0,29.41,2
-1119549,6,Umesh Yadav,not out,1,16,0,0,6.25,2
-1119549,1,Alastair Cook,b Ashwin,0,14,0,0,0.00,3
-1119549,1,Keaton Jennings,c Rahul b Ashwin,8,18,1,0,44.44,3
-1119549,1,Joe Root,c Rahul b Ashwin,14,35,1,0,40.00,3
-1119549,1,Dawid Malan,c Rahane b Sharma,20,64,2,0,31.25,3
-1119549,1,Jonny Bairstow,c Dhawan b Sharma,28,40,5,0,70.00,3
-1119549,1,Ben Stokes,c Kohli b Sharma,6,13,0,0,46.15,3
-1119549,1,Jos Buttler,c †Karthik b Sharma,1,2,0,0,50.00,3
-1119549,1,Sam Curran,c †Karthik b Yadav,63,65,9,2,96.92,3
-1119549,1,Adil Rashid,b Yadav,16,40,1,0,40.00,3
-1119549,1,Stuart Broad,c Dhawan b Sharma,11,28,0,0,39.28,3
-1119549,1,James Anderson,not out,0,0,0,0,-,3
-1119549,6,Murali Vijay,lbw b Broad,6,17,0,0,35.29,4
-1119549,6,Shikhar Dhawan,c †Bairstow b Broad,13,24,1,0,54.16,4
-1119549,6,KL Rahul,c †Bairstow b Stokes,13,24,2,0,54.16,4
-1119549,6,Virat Kohli,lbw b Stokes,51,93,4,0,54.83,4
-1119549,6,Ajinkya Rahane,c †Bairstow b Curran,2,16,0,0,12.50,4
-1119549,6,Ravichandran Ashwin,c †Bairstow b Anderson,13,15,3,0,86.66,4
-1119549,6,Dinesh Karthik,c Malan b Anderson,20,50,2,0,40.00,4
-1119549,6,Hardik Pandya,c Cook b Stokes,31,61,4,0,50.81,4
-1119549,6,Mohammed Shami,c †Bairstow b Stokes,0,3,0,0,0.00,4
-1119549,6,Ishant Sharma,lbw b Rashid,11,15,2,0,73.33,4
-1119549,6,Umesh Yadav,not out,0,8,0,0,0.00,4
+Match ID,Team ID,Player ID,Name,Desc,Runs,Balls,4s,6s,SR,Innings
+1119549,1,11728,Alastair Cook,b Ashwin,13,28,2,0,46.42,1
+1119549,1,440780,Keaton Jennings,b Mohammed Shami,42,98,4,0,42.85,1
+1119549,1,303669,Joe Root,run out (Kohli),80,156,9,0,51.28,1
+1119549,1,236489,Dawid Malan,lbw b Mohammed Shami,8,14,1,0,57.14,1
+1119549,1,297433,Jonny Bairstow,b Yadav,70,88,9,0,79.54,1
+1119549,1,311158,Ben Stokes,c & b Ashwin,21,41,2,0,51.21,1
+1119549,1,308967,Jos Buttler,lbw b Ashwin,0,2,0,0,0.00,1
+1119549,1,662973,Sam Curran,c †Karthik b Mohammed Shami,24,71,3,0,33.80,1
+1119549,1,244497,Adil Rashid,lbw b Sharma,13,18,2,0,72.22,1
+1119549,1,10617,Stuart Broad,lbw b Ashwin,1,7,0,0,14.28,1
+1119549,1,8608,James Anderson,not out,2,15,0,0,13.33,1
+1119549,6,237095,Murali Vijay,lbw b Curran,20,45,4,0,44.44,2
+1119549,6,28235,Shikhar Dhawan,c Malan b Curran,26,46,3,0,56.52,2
+1119549,6,422108,KL Rahul,b Curran,4,2,1,0,200.00,2
+1119549,6,253802,Virat Kohli,c Broad b Rashid,149,225,22,1,66.22,2
+1119549,6,277916,Ajinkya Rahane,c Jennings b Stokes,15,34,1,0,44.11,2
+1119549,6,30045,Dinesh Karthik,b Stokes,0,4,0,0,0.00,2
+1119549,6,625371,Hardik Pandya,lbw b Curran,22,52,3,0,42.30,2
+1119549,6,26421,Ravichandran Ashwin,b Anderson,10,15,2,0,66.66,2
+1119549,6,481896,Mohammed Shami,c Malan b Anderson,2,4,0,0,50.00,2
+1119549,6,236779,Ishant Sharma,lbw b Rashid,5,17,0,0,29.41,2
+1119549,6,376116,Umesh Yadav,not out,1,16,0,0,6.25,2
+1119549,1,11728,Alastair Cook,b Ashwin,0,14,0,0,0.00,3
+1119549,1,440780,Keaton Jennings,c Rahul b Ashwin,8,18,1,0,44.44,3
+1119549,1,303669,Joe Root,c Rahul b Ashwin,14,35,1,0,40.00,3
+1119549,1,236489,Dawid Malan,c Rahane b Sharma,20,64,2,0,31.25,3
+1119549,1,297433,Jonny Bairstow,c Dhawan b Sharma,28,40,5,0,70.00,3
+1119549,1,311158,Ben Stokes,c Kohli b Sharma,6,13,0,0,46.15,3
+1119549,1,308967,Jos Buttler,c †Karthik b Sharma,1,2,0,0,50.00,3
+1119549,1,662973,Sam Curran,c †Karthik b Yadav,63,65,9,2,96.92,3
+1119549,1,244497,Adil Rashid,b Yadav,16,40,1,0,40.00,3
+1119549,1,10617,Stuart Broad,c Dhawan b Sharma,11,28,0,0,39.28,3
+1119549,1,8608,James Anderson,not out,0,0,0,0,,3
+1119549,6,237095,Murali Vijay,lbw b Broad,6,17,0,0,35.29,4
+1119549,6,28235,Shikhar Dhawan,c †Bairstow b Broad,13,24,1,0,54.16,4
+1119549,6,422108,KL Rahul,c †Bairstow b Stokes,13,24,2,0,54.16,4
+1119549,6,253802,Virat Kohli,lbw b Stokes,51,93,4,0,54.83,4
+1119549,6,277916,Ajinkya Rahane,c †Bairstow b Curran,2,16,0,0,12.50,4
+1119549,6,26421,Ravichandran Ashwin,c †Bairstow b Anderson,13,15,3,0,86.66,4
+1119549,6,30045,Dinesh Karthik,c Malan b Anderson,20,50,2,0,40.00,4
+1119549,6,625371,Hardik Pandya,c Cook b Stokes,31,61,4,0,50.81,4
+1119549,6,481896,Mohammed Shami,c †Bairstow b Stokes,0,3,0,0,0.00,4
+1119549,6,236779,Ishant Sharma,lbw b Rashid,11,15,2,0,73.33,4
+1119549,6,376116,Umesh Yadav,not out,0,8,0,0,0.00,4

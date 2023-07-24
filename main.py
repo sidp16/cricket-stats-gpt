@@ -3,6 +3,7 @@ from langchain.agents import create_sql_agent, AgentExecutor
 from langchain.agents.agent_toolkits import SQLDatabaseToolkit
 from langchain.agents.agent_types import AgentType
 from langchain.chat_models import ChatOpenAI
+from kor import create_extraction_chain, Object, Text
 from langchain.sql_database import SQLDatabase
 from langchain.llms import OpenAI
 from espncricinfo.match import Match
@@ -16,6 +17,8 @@ from scorecard_tools.scraping_tools import (
     extract_team_data,
     extract_venue_data,
 )
+import mysql.connector
+from mysql.connector import Error
 from scorecard_tools.database_insertion_tools import insert_data
 
 
@@ -35,28 +38,29 @@ def make_filename(type, match_id):
     return filename
 
 
-def run():
-    batting, players1 = extract_batting_data(1298150)
-    # bowling, players2 = extract_bowling_data(1298150)
-    # series = extract_series_data(1298150)
-    # teams = extract_team_data(1298150)
-    # matches = extract_match_data(1298150)
+def run(match_id):
+    batting, players1 = extract_batting_data(match_id)
+    bowling, players2 = extract_bowling_data(match_id)
+    venues = extract_venue_data(match_id)
+    series = extract_series_data(match_id)
+    teams = extract_team_data(match_id)
+    matches = extract_match_data(match_id)
 
     print("\n\n\nInserting...")
-    # insert_data(players1, "players")
-    # insert_data(players2, "players")
-    # insert_data(teams, "teams")
-    # insert_data(series, "series")
-    # insert_data(venues, "venues")
-    # insert_data(matches, "matches")
+    insert_data(players1, "players")
+    insert_data(players2, "players")
+    insert_data(teams, "teams")
+    insert_data(series, "series")
+    insert_data(venues, "venues")
+    insert_data(matches, "matches")
     insert_data(batting, "batting")
-    # insert_data(bowling, "bowling")
+    insert_data(bowling, "bowling")
 
     print("ALL DONE!")
 
 
 if __name__ == "__main__":
-    run()
+    run(1144526)
     # IND V PAK 2022 T20 WC
     # matchDetails = extract_match_data("1298134", "1298150")
     # insert_data(matchDetails, "matches")
@@ -68,9 +72,6 @@ if __name__ == "__main__":
 
     # Testing for an ODI: IND V SL 2011 ODI WC FINAL
     # matchDetails2 = extract_match_data("381449", "433606")
-    # insert_data(matchDetails2, "matches")
-    # batting2 = extract_batting_data("381449", "433606")
-    # insert_data(batting2, "batting")
 
     # Testing for a Test with 4 Innings: IND V ENG 2018 1st Test
     # runMatch("1119528", "1119549")
@@ -82,40 +83,32 @@ if __name__ == "__main__":
     # runMatch("61687", "63864")
 
     ## -- METHOD 3 -- ##
-    # try:
-    #     connection = mysql.connector.connect(
-    #         host="localhost",
-    #         database="scorecards",
-    #         user="root",
-    #         password=password,
-    #     )
-    #     if connection.is_connected():
-    #         print("Connected to MySQL server!")
-    # except Error as e:
-    #     print(f"Error connecting to MySQL server: {e}")
+    try:
+        connection = mysql.connector.connect(
+            host="localhost",
+            database="scorecards",
+            user="root",
+            password=password,
+        )
+        if connection.is_connected():
+            print("Connected to MySQL server!")
+    except Error as e:
+        print(f"Error connecting to MySQL server: {e}")
 
-    # db = SQLDatabase.from_uri(sql_database_uri)
-    # toolkit = SQLDatabaseToolkit(
-    #     db=db, llm=OpenAI(temperature=0, openai_api_key=gpt_api_key)
-    # )
+    db = SQLDatabase.from_uri(sql_database_uri)
+    toolkit = SQLDatabaseToolkit(
+        db=db, llm=OpenAI(temperature=0, openai_api_key=gpt_api_key)
+    )
 
-    # agent = create_sql_agent(
-    #     llm=ChatOpenAI(
-    #         temperature=0, model="gpt-3.5-turbo-0613", openai_api_key=gpt_api_key
-    #     ),
-    #     toolkit=toolkit,
-    #     verbose=True,
-    #     # agent_type=AgentType.OPENAI_FUNCTIONS,
-    # )
+    agent = create_sql_agent(
+        llm=ChatOpenAI(
+            temperature=0, model="gpt-3.5-turbo-0613", openai_api_key=gpt_api_key
+        ),
+        toolkit=toolkit,
+        verbose=True,
+        # agent_type=AgentType.OPENAI_FUNCTIONS,
+    )
 
     # print(agent.agent.llm_chain.prompt.template)
 
-    # with get_openai_callback() as cb:
-    #     try:
-    #         agent.run("Who has the highest ever score?")
-    #     except:
-    #         pass
-    #     print(f"Total Tokens: {cb.total_tokens}")
-    #     print(f"Prompt Tokens: {cb.prompt_tokens}")
-    #     print(f"Completion Tokens: {cb.completion_tokens}")
-    #     print(f"Total Cost (USD): ${cb.total_cost}")
+    # agent.run(f"List all the games Sachin has played in.")

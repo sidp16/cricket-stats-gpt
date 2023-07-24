@@ -195,7 +195,7 @@ def extract_bowling_data(match_id):
                     pd.Series(
                         [
                             match_id,
-                            batting_first if (i == 0 or i == 2) else bowling_first,
+                            bowling_first if (i == 0 or i == 2) else batting_first,
                             player_id,
                             cols[0],
                             cols[1],
@@ -367,22 +367,3 @@ def extract_venue_data(match_id):
     venues_df = venues_df.append(venue_series, ignore_index=True)
 
     return venues_df
-
-
-if __name__ == "__main__":
-    # m = Match("1298150")
-    # print(m._date())
-    # series_id = m.get_json()["series"][0]["object_id"]
-    # s = Series(series_id)
-    # print(f"{series_id}: {s.name}")
-    # p = Player("253802")
-    # readable_date = dateparser.parse(p._date_of_birth()).strftime("%Y-%m-%d")
-    # print(readable_date)
-    # print(p._bowling_style()["description"])
-    # print(p._batting_style()["description"])
-    # print(f"{m._ground_id()}: {m._ground_name()}")
-
-    # batting, players = extract_batting_data(1298150)
-    # teams = extract_team_data(1298150)
-    # print(teams)
-    print("hi")
